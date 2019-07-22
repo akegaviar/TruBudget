@@ -23,7 +23,7 @@ const schema = Joi.object({
     .required()
     .items(globalPermissionsTraceEventSchema),
   additionalData: AdditionalData.schema,
-});
+}).options({ stripUnknown: true });
 
 export function validate(input: any): Result.Type<GlobalPermissions> {
   const { error, value } = Joi.validate(input, schema);

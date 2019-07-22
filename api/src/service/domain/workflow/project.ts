@@ -49,7 +49,7 @@ const schema = Joi.object({
     .required()
     .items(projectTraceEventSchema),
   additionalData: AdditionalData.schema.required(),
-});
+}).options({ stripUnknown: true });
 
 export function validate(input: any): Result.Type<Project> {
   const { error } = Joi.validate(input, schema);

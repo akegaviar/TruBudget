@@ -36,7 +36,7 @@ const schema = Joi.object({
   log: Joi.array()
     .required()
     .items(notificationTraceEventSchema),
-});
+}).options({ stripUnknown: true });
 
 export function validate(input: any): Result.Type<Notification> {
   const { error, value } = Joi.validate(input, schema);

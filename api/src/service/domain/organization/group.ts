@@ -43,7 +43,7 @@ const schema = Joi.object({
     .required()
     .items(groupTraceEventSchema),
   additionalData: AdditionalData.schema.required(),
-});
+}).options({ stripUnknown: true });
 
 export function validate(input: any): Result.Type<Group> {
   const { error, value } = Joi.validate(input, schema);

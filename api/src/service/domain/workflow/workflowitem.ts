@@ -62,81 +62,83 @@ export interface RedactedWorkflowitem {
 
 export type ScrubbedWorkflowitem = Workflowitem | RedactedWorkflowitem;
 
-const schema = Joi.object().keys({
-  isRedacted: Joi.boolean().required(),
-  id: Joi.string().required(),
-  subprojectId: Subproject.idSchema.required(),
-  createdAt: Joi.date()
-    .iso()
-    .required(),
-  dueDate: Joi.date().iso(),
-  displayName: Joi.string().required(),
-  // This should use exchangeRateSchema but can't, because of backward compatibility:
-  exchangeRate: Joi.string()
-    .when("amountType", {
-      is: Joi.valid("N/A"),
-      then: Joi.forbidden(),
-    })
-    .when("status", {
-      is: Joi.valid("closed"),
-      then: Joi.required(),
-      otherwise: Joi.optional(),
-    }),
-  billingDate: Joi.date()
-    .iso()
-    .when("amountType", {
-      is: Joi.valid("N/A"),
-      then: Joi.forbidden(),
-    })
-    .when("status", {
-      is: Joi.valid("closed"),
-      then: Joi.required(),
-      otherwise: Joi.optional(),
-    }),
-  amount: moneyAmountSchema
-    .when("amountType", {
-      is: Joi.valid("N/A"),
-      then: Joi.forbidden(),
-    })
-    .when("status", {
-      is: Joi.valid("closed"),
-      then: Joi.required(),
-      otherwise: Joi.optional(),
-    }),
-  currency: Joi.string()
-    .when("amountType", {
-      is: Joi.valid("N/A"),
-      then: Joi.forbidden(),
-    })
-    .when("status", {
-      is: Joi.valid("closed"),
-      then: Joi.required(),
-      otherwise: Joi.optional(),
-    }),
-  amountType: Joi.string()
-    .valid("N/A", "disbursed", "allocated")
-    .required(),
-  description: Joi.string().allow(""),
-  status: Joi.string()
-    .valid("open", "closed")
-    .required(),
-  assignee: Joi.string(),
-  documents: Joi.array()
-    .required()
-    .items(
-      Joi.object().keys({
-        id: Joi.string(),
-        hash: Joi.string(),
+const schema = Joi.object()
+  .keys({
+    isRedacted: Joi.boolean().required(),
+    id: Joi.string().required(),
+    subprojectId: Subproject.idSchema.required(),
+    createdAt: Joi.date()
+      .iso()
+      .required(),
+    dueDate: Joi.date().iso(),
+    displayName: Joi.string().required(),
+    // This should use exchangeRateSchema but can't, because of backward compatibility:
+    exchangeRate: Joi.string()
+      .when("amountType", {
+        is: Joi.valid("N/A"),
+        then: Joi.forbidden(),
+      })
+      .when("status", {
+        is: Joi.valid("closed"),
+        then: Joi.required(),
+        otherwise: Joi.optional(),
       }),
-    ),
-  permissions: Joi.object()
-    .pattern(/.*/, Joi.array().items(Joi.string()))
-    .required(),
-  log: Joi.array()
-    .required()
-    .items(workflowitemTraceEventSchema),
-  additionalData: AdditionalData.schema.required(),
-});
+    billingDate: Joi.date()
+      .iso()
+      .when("amountType", {
+        is: Joi.valid("N/A"),
+        then: Joi.forbidden(),
+      })
+      .when("status", {
+        is: Joi.valid("closed"),
+        then: Joi.required(),
+        otherwise: Joi.optional(),
+      }),
+    amount: moneyAmountSchema
+      .when("amountType", {
+        is: Joi.valid("N/A"),
+        then: Joi.forbidden(),
+      })
+      .when("status", {
+        is: Joi.valid("closed"),
+        then: Joi.required(),
+        otherwise: Joi.optional(),
+      }),
+    currency: Joi.string()
+      .when("amountType", {
+        is: Joi.valid("N/A"),
+        then: Joi.forbidden(),
+      })
+      .when("status", {
+        is: Joi.valid("closed"),
+        then: Joi.required(),
+        otherwise: Joi.optional(),
+      }),
+    amountType: Joi.string()
+      .valid("N/A", "disbursed", "allocated")
+      .required(),
+    description: Joi.string().allow(""),
+    status: Joi.string()
+      .valid("open", "closed")
+      .required(),
+    assignee: Joi.string(),
+    documents: Joi.array()
+      .required()
+      .items(
+        Joi.object().keys({
+          id: Joi.string(),
+          hash: Joi.string(),
+        }),
+      ),
+    permissions: Joi.object()
+      .pattern(/.*/, Joi.array().items(Joi.string()))
+      .required(),
+    log: Joi.array()
+      .required()
+      .items(workflowitemTraceEventSchema),
+    additionalData: AdditionalData.schema.required(),
+  })
+  .options({ stripUnknown: true });
 
 export function validate(input: any): Result.Type<Workflowitem> {
   const { error } = Joi.validate(input, schema);

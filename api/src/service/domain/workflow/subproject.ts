@@ -61,7 +61,7 @@ const schema = Joi.object({
     .required()
     .items(subprojectTraceEventSchema),
   additionalData: AdditionalData.schema.required(),
-});
+}).options({ stripUnknown: true });
 
 export function validate(input: any): Result.Type<Subproject> {
   const { error } = Joi.validate(input, schema);
